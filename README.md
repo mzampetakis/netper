@@ -66,7 +66,7 @@ In order to store execution's output to a file and print to the console output w
 sudo ./netperf.sh 2>&1 | tee netperf.out
 ```
 
-### Results
+## Results
 
 All results are located under the give `${OUTPUT}` directory (of `netperf` if none provided) and then a directory with 
 the start date and time that contains all the results. All iperf results are prefixed with `iperf` and all ping test 
@@ -76,3 +76,14 @@ command(s) that were executed.
 
 A file named `info.txt` contains the given `${NAME}` during the script execution. Output of the script will be stored 
 at the `netperf.out` file in the same directory with the script.
+
+### Extracting results' info
+
+The script `extract.sh` accepts a folder as an arguments and parses iperf and ping results in order to extract the mean 
+and the standard deviation of each result's file. It can be used as:
+```bash
+./extract.sh results/2024-07-09-12-50-21/
+```
+
+The results will be printed out and also written to files with the same name as the results' files.
+The suffix of these metrics' files will be `_results.txt` 
