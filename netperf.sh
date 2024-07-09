@@ -66,6 +66,7 @@ mkdir -p $OUTPUT_DIR/${RUN_STAMP}
 ORIGIN_MTU=$(ifconfig "${ADAPTER}" | grep -i mtu | awk '{print $4}')
 echo "Original MTU was: ${ORIGIN_MTU}"
 ip link set dev ${ADAPTER} mtu 1500
+tc qdisc del dev ${ADAPTER} root || true
 sleep 3
 
 printf "\n${CYAN}Installing required packages.${NC}\n"
@@ -110,7 +111,7 @@ else
                 fi
                 if [ "$protocol" == "UDP" ]; then
                         RESULTS_FILENAME="iperf_protocol_${protocol}"
-                        cmd="${base_iperf_cmd} -u"
+                        cmd="${base_iperf_cmd} -u -b 0"
                         echo "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
                         eval "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
                 fi
@@ -225,9 +226,10 @@ fi
 ############################# Latency Measurements #############################
 printf "\n${CYAN}Measuring latency network performance.${NC}\n"
 
-
 base_ping_cmd="ping ${SERVER} -I ${ADAPTER}"
 ip link set dev ${ADAPTER} mtu 1500
+tc qdisc del dev ${ADAPTER} root || true
+sleep 3
 
 if [ "$RUN_DEFAULT_PING" == "1" ]; then
         RESULTS_FILENAME="ping_basic"
