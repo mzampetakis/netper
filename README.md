@@ -1,7 +1,6 @@
 # Network Performance
 
-This repo hosts a shell script that will run various network performance measurements using various configuration 
-options.
+This repo hosts a shell script that will run various network performance measurements using variable configurations.
 
 ## Setup
 
@@ -10,8 +9,6 @@ options.
 The application uses configuration through Environment Variables. Here is a list with the details and the default
 value for each one of them:
 
-> sensible default values
-> Suggested Variation values
 
 | EnvVar                | Description                                                                              | Default Values | Suggested Variation Values          |
 |-----------------------|------------------------------------------------------------------------------------------|----------------|-------------------------------------|
@@ -40,16 +37,20 @@ used by the script when it runs. Feel free to ignore it, if you are using anothe
 configuration is provided the script will run the iperf and ping measurements using the default values.
 
 For the Name variable it is recommended to add a json formatted string to contain all the details of the hardware setup 
-in order to allow later to identify the setup.
+in order to allow later to identify the setup. A meaningful name could be like this:
+```
+NAME={"name":"Bare metal client to Bare Metal server with Ubuntu v22.04","client":{"host":"Ubuntu Server v22.04","vm_type":"Bare Metal","network":"10G Bare Metal"},"server":{"host":"Ubuntu Server v22.04","vm_type":"Bare Metal","network":"10G Bare Metal"}}
+```
 
 ## Running the script
 
-Before proceeding with executing the script, ensure that the iperf3 server is running on the other host using:
+Before proceeding with executing the script, ensure that the iperf3 server is running on the server host using:
 ```bash
 iperf3 -s -p ${IPERF_PORT} -J
 ```
 
-In order to run the script we must set first any configuration through EnvVars and then execute it by running:
+In order to run the script we must set first any configuration through EnvVars and then execute it at the client side 
+by running:
 ```bash
 sudo ./netperf.sh
 ```
@@ -58,7 +59,7 @@ sudo ./netperf.sh
 
 We can also set the EnvVars and run the script at the same time using
 ```bash
-sudo ENVKEY1=ENVVAR1 ENVKEY2=ENVVAR2 ENVKEY3=ENVVAR3 ./netperf.sh
+sudo NAME="Test run" ADAPTER=eth0 SERVER=192.168.1.44 ./netperf.sh
 ```
 
 In order to store execution's output to a file and print to the console output we can run the script with:
@@ -76,6 +77,37 @@ command(s) that were executed.
 
 A file named `info.txt` contains the given `${NAME}` during the script execution. Output of the script will be stored 
 at the `netperf.out` file in the same directory with the script.
+
+The final contents of the results will contain files like the listed ones bellow:
+```
+├── 2024-07-09-12-50-21
+│   ├── iperf_buffer_length_128k.cmd
+│   ├── iperf_buffer_length_128k.json
+│   ├── iperf_buffer_length_128k_results.txt
+│   ├── iperf_buffer_length_16k.cmd
+│   ├── iperf_buffer_length_16k.json
+│   ├── iperf_buffer_length_16k_results.txt
+│   ├── iperf_streams_2.cmd
+│   ├── iperf_streams_2.json
+│   ├── iperf_streams_2_results.txt
+│   ├── iperf_streams_4.cmd
+│   ├── iperf_streams_4.json
+│   ├── iperf_streams_4_results.txt
+│   ├── ping_latency_50ms.cmd
+│   ├── ping_latency_50ms.json
+│   ├── ping_latency_50ms_results.txt
+│   ├── ping_latency_5ms.cmd
+│   ├── ping_latency_5ms.json
+│   ├── ping_latency_5ms_results.txt
+│   ├── ping_packet_size_1024.cmd
+│   ├── ping_packet_size_1024.json
+│   ├── ping_packet_size_1024_results.txt
+│   ├── ping_packet_size_56.cmd
+│   ├── ping_packet_size_56.json
+│   └── ping_packet_size_56_results.txt
+│   └── ...
+└── info.txt
+```
 
 ### Extracting results' info
 

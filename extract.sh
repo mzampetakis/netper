@@ -45,7 +45,7 @@ echo "Extracting results for IPERF files."
 for FILE in "$DIR_NAME"/"iperf"*".json"; do
   # Check if any files match the pattern
   if [ -e "$FILE" ]; then
-    echo "======================================================================"
+    echo "----------------------------------------------------------------------"
     echo "Extracting results for '$FILE' file."
     RESULTS_FILE="${FILE%.json}${SUFFIX}"
 
@@ -94,7 +94,7 @@ echo "Extracting results for PING files."
 for FILE in "$DIR_NAME"/"ping"*".json"; do
   # Check if any files match the pattern
   if [ -e "$FILE" ]; then
-    echo "======================================================================"
+    echo "----------------------------------------------------------------------"
     echo "Extracting results for '$FILE' file."
     RESULTS_FILE="${FILE%.json}${SUFFIX}"
 
