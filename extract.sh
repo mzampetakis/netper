@@ -8,7 +8,6 @@ CYAN="\033[0;36m"
 ERROR='\033[41m'
 NC='\033[0m'
 
-
 ############################## Checking Arguments ##############################
 if [ -z "$1" ]; then
   echo "No directory name provided. Usage: $0 <directory_name>"
@@ -34,9 +33,8 @@ fi
 }
 
 printf "\n${GREEN}Extracting measurements from : ${FOLDER}.${NC}\n"
-SUFFIX="_results.txt"
+SUFFIX="_results.json"
 ################################## End Setup ###################################
-
 
 ########################### Extracting iperf results ###########################
 # Iterate over files with the specific prefix and suffix
@@ -60,24 +58,27 @@ for FILE in "$DIR_NAME"/"iperf"*".json"; do
 
     # Calculate average mbps
     if [ "$TOTAL_INTERVALS" -gt 0 ]; then
-      AVERAGE_MBITS_PER_SECOND=$(echo "$MBITS_PER_SECOND_SUM / $TOTAL_INTERVALS" | bc -l)
-      echo "    Average Bandwidth: $AVERAGE_MBITS_PER_SECOND mbps"
-      echo "Average Bandwidth: $AVERAGE_MBITS_PER_SECOND mbps" > $RESULTS_FILE
+      AVERAGE_BANDWIDTH_MBPS=$(echo "$MBITS_PER_SECOND_SUM / $TOTAL_INTERVALS" | bc -l)
+      echo "    Average Bandwidth: $AVERAGE_BANDWIDTH_MBPS mbps"
       # Calculate standard deviation of bimbps 
       SUM_SQUARE_DIFF=0
       for (( i=0; i<$TOTAL_INTERVALS; i++ )); do
         BITS_PER_SECOND=$(jq --argjson idx "$i" '.intervals[$idx].sum.bits_per_second' "$FILE")
         MBITS_PER_SECOND=$(echo "$BITS_PER_SECOND / 1000000" | bc -l)
-        DIFF=$(echo "$MBITS_PER_SECOND - $AVERAGE_MBITS_PER_SECOND" | bc -l)
+        DIFF=$(echo "$MBITS_PER_SECOND - $AVERAGE_BANDWIDTH_MBPS" | bc -l)
         SQUARE_DIFF=$(echo "$DIFF * $DIFF" | bc -l)
         SUM_SQUARE_DIFF=$(echo "$SUM_SQUARE_DIFF + $SQUARE_DIFF" | bc -l)
       done
 
       VARIANCE=$(echo "$SUM_SQUARE_DIFF / $TOTAL_INTERVALS" | bc -l)
-      STANDARD_DEVIATION=$(echo "sqrt($VARIANCE)" | bc -l)
-      echo "    Standard Bandwidth Deviation: $STANDARD_DEVIATION mbps"
+      DEVIATION_BANDWIDTH_MBPS=$(echo "sqrt($VARIANCE)" | bc -l)
+      echo "    Standard Bandwidth Deviation: $DEVIATION_BANDWIDTH_MBPS mbps"
 
-      echo "Standard Bandwidth Deviation: $STANDARD_DEVIATION mbps" >> $RESULTS_FILE
+      json_results=$(cat <<EOF
+      {"average_bandwidth_mbps": "${AVERAGE_BANDWIDTH_MBPS}","standard_deviation_bandwidth_mbps": "${DEVIATION_BANDWIDTH_MBPS}"}
+EOF
+      )
+      echo "${json_results}" | jq > $RESULTS_FILE
     else
       echo "    No intervals found in the JSON file."
     fi
@@ -101,15 +102,22 @@ for FILE in "$DIR_NAME"/"ping"*".json"; do
     rtt_line=$(grep "rtt min/avg/max/mdev" "$FILE")
 
     # Extract avg and mdev values from the RTT statistics line
-    avg=$(echo "$rtt_line" | awk -F'/' '{print $5}')
-    mdev=$(echo "$rtt_line" | awk -F'/' '{print $7}' | sed 's/ ms.*//')
+    AVERAGE_LATENCY_MS=$(echo "$rtt_line" | awk -F'/' '{print $5}')
+    DEVIATION_LATENCY_MS=$(echo "$rtt_line" | awk -F'/' '{print $7}' | sed 's/ ms.*//')
 
     # Output the results
-    echo "    Average Latency: $avg ms"
-    echo "    Standard Latency Deviation: $mdev ms"
+    echo "    Average Latency: $AVERAGE_LATENCY_MS ms"
+    echo "    Standard Latency Deviation: $DEVIATION_LATENCY_MS ms"
 
-    echo "Average Latency: $avg ms" > $RESULTS_FILE
-    echo "Standard Latency Deviation: $mdev ms" >> $RESULTS_FILE
+    echo "Average Latency: $AVERAGE_LATENCY_MS ms" > $RESULTS_FILE
+    echo "Standard Latency Deviation: $DEVIATION_LATENCY_MS ms" >> $RESULTS_FILE
+
+
+      json_results=$(cat <<EOF
+      {"average_latency_ms": "${AVERAGE_LATENCY_MS}","standard_deviation_latency_ms": "${DEVIATION_LATENCY_MS}"}
+EOF
+      )
+      echo "${json_results}" | jq > "$RESULTS_FILE"
   fi
 done
 

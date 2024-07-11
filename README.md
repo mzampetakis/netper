@@ -10,25 +10,27 @@ The application uses configuration through Environment Variables. Here is a list
 value for each one of them:
 
 
-| EnvVar                | Description                                                                              | Default Values | Suggested Variation Values          |
-|-----------------------|------------------------------------------------------------------------------------------|----------------|-------------------------------------|
-| * `NAME`              | A unique name that identifies the specific setup that the tests will run.                | ""             | ""                                  |
-| `OUTPUT_DIR`          | A directory to store all measurements' output.                                           | "netperf"      | "netperf"                           |
-| * `SERVER`            | The server address to use. Can be the IP (`-c` arg).                                     | ""             | ""                                  |
-| * `ADAPTER`           | The adapter to use for traffic routing.                                                  | ""             | ""                                  |
-| `IPERF_PORT`          | Port to use for the iperf connection to the server. (`-p` arg).                          | "5201"         | "5201"                              |
-| `IPERF_DURATION`      | Duration of the iperf run in secs. (`-t` arg) (Multiple args delimited by `;`)           | "10"           | "10;60;300"                         |
-| `IPERF_PROTOCOL`      | Protocols to test (TCP and UDP). Accepts multiple args delimited by `;`.                 | "TCP"          | "TCP;UDP"                           |
-| `IPERF_DIRECTION`     | Direction of traffic to test. (Client to server, Reverse or bidirectional.               | "NORMAL"       | "NORMAL;REVERSE;BIDIRECTIONAL"      |
-| `IPERF_STREAMS`       | Streams to use for iperf run. (`-P` arg) (Multiple args delimited by `;`)                | "1"            | "1;2;4;8;16"                        |
-| `IPERF_BUFFER_LENGTH` | Buffer length for iperf TCP tests. (`-l` arg) (Multiple args delimited by `;`)           | "128k"         | "16k;128k;1M"                       |
-| `IPERF_WINDOW_SIZE`   | Buffer length for iperf TCP tests. (`-w` arg) (Multiple args delimited by `;`)           | Depends on OS  | "64k;128k;1M"                       |
-| `IPERF_MTU`           | Change the MTU size of the network. (`-M` arg). (Multiple args delimited by `;`)         | "1500"         | "576;1500;9000;1472;2000;3000;4000" |
-| `IPERF_LATENCY`       | Add custom latency to network.                                                           | "0s"           | "5ms;50ms;100ms"                    |
-| `IPERF_PACKET_LOSS`   | Add packet loss to network.                                                              | "0%"           | "0.5%;1%;3%"                        |
-| `PING_INTERVAL`       | Time interval in seconds between ping tests. (`-i` Arg) (Multiple args delimited by `;`) | "1"            | "0.1;0.5;1;5"                       |
-| `PING_PACKET_SIZE`    | Packet size of packets send by ping tests. (`-i` Arg) (Multiple args delimited by `;`)   | "56"           | "32;56;128;1024;4096"               |
-| `PING_LATENCY`        | Add custom latency to network.                                                           | "0ms"          | "5ms;50ms;100ms"                    |
+| EnvVar                   | Description                                                                              | Default Values | Suggested Variation Values          |
+|--------------------------|------------------------------------------------------------------------------------------|----------------|-------------------------------------|
+| * `NAME`                 | A unique name that identifies the specific setup that the tests will run.                | ""             | ""                                  |
+| `OUTPUT_DIR`             | A directory to store all measurements' output.                                           | "netperf"      | "netperf"                           |
+| * `SERVER`               | The server address to use. Can be the IP (`-c` arg).                                     | ""             | ""                                  |
+| * `ADAPTER`              | The adapter to use for traffic routing.                                                  | ""             | ""                                  |
+| `IPERF_PORT`             | Port to use for the iperf connection to the server. (`-p` arg).                          | "5201"         | "5201"                              |
+| `IPERF_DEFAULT_DURATION` | Default Duration of the iperf run in secs. (`-t` arg)                                    | "20"           | "20"                                |
+| `IPERF_DURATION`         | Duration of the iperf run in secs. (`-t` arg) (Multiple args delimited by `;`)           | "10"           | "10;30;60;300"                      |
+| `IPERF_PROTOCOL`         | Protocols to test (TCP and UDP). Accepts multiple args delimited by `;`.                 | "TCP"          | "TCP;UDP"                           |
+| `IPERF_DIRECTION`        | Direction of traffic to test. (Client to server, Reverse or bidirectional.               | "NORMAL"       | "NORMAL;REVERSE;BIDIRECTIONAL"      |
+| `IPERF_STREAMS`          | Streams to use for iperf run. (`-P` arg) (Multiple args delimited by `;`)                | "1"            | "1;2;4;8;16"                        |
+| `IPERF_BUFFER_LENGTH`    | Buffer length for iperf TCP tests. (`-l` arg) (Multiple args delimited by `;`)           | "128k"         | "16k;128k;1M"                       |
+| `IPERF_WINDOW_SIZE`      | Buffer length for iperf TCP tests. (`-w` arg) (Multiple args delimited by `;`)           | Depends on OS  | "64k;128k;1M"                       |
+| `IPERF_MTU`              | Change the MTU size of the network. (`-M` arg). (Multiple args delimited by `;`)         | "1500"         | "576;1500;9000;1472;2000;3000;4000" |
+| `IPERF_LATENCY`          | Add custom latency to network.                                                           | "0s"           | "5ms;50ms;100ms"                    |
+| `IPERF_PACKET_LOSS`      | Add packet loss to network.                                                              | "0%"           | "0.5%;1%;3%"                        |
+| `PING_DEFAULT_COUNT`     | Count of pings to perform. (`-c` Arg)                                                    | "60"           | "60"                                |
+| `PING_INTERVAL`          | Time interval in seconds between ping tests. (`-i` Arg) (Multiple args delimited by `;`) | "1"            | "0.1;0.5;1;5"                       |
+| `PING_PACKET_SIZE`       | Packet size of packets send by ping tests. (`-s` Arg) (Multiple args delimited by `;`)   | "56"           | "32;56;128;1024;4096"               |
+| `PING_LATENCY`           | Add custom latency to network.                                                           | "0ms"          | "5ms;50ms;100ms"                    |
 
 > EnvVars marked with a `*` are mandatory to run the tests.
 
@@ -117,5 +119,5 @@ and the standard deviation of each result's file. It can be used as:
 ./extract.sh results/2024-07-09-12-50-21/
 ```
 
-The results will be printed out and also written to files with the same name as the results' files.
-The suffix of these metrics' files will be `_results.txt` 
+The results will be printed out and also written to files with the same name as the results' files in a json format.
+The suffix of these metrics' files will be `_results.json` 

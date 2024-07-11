@@ -47,6 +47,17 @@ if [ -z "$PING_PACKET_SIZE" ] && [ -z "$PING_LATENCY" ];
 then
         RUN_DEFAULT_PING=1
 fi
+
+if [ -z "$IPERF_DEFAULT_DURATION" ];
+then
+        IPERF_DEFAULT_DURATION=20
+fi
+
+if [ -z "$PING_DEFAULT_COUNT" ];
+then
+        PING_DEFAULT_COUNT=60
+fi
+
 ############################ End Checking Mandatory ############################
 
 #################################### Setup #####################################
@@ -79,15 +90,15 @@ apt-get install -y iproute2
 ############################ Bandwidth Measurements ############################
 printf "\n${CYAN}Measuring bandwidth network performance.${NC}\n"
 
-echo ${NAME} > ${OUTPUT_DIR}/info.txt
+echo ${NAME} > ${OUTPUT_DIR}/${RUN_STAMP}/info.txt
 base_iperf_cmd="iperf3 -c ${SERVER} -p ${IPERF_PORT} -O 5 -J --get-server-output"
-echo Base command: ${base_iperf_cmd} >> ${OUTPUT_DIR}/info.txt
+echo Base command: ${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} >> ${OUTPUT_DIR}/${RUN_STAMP}/info.txt
 
 ### Basic run
 if [ "$RUN_DEFAULT_IPERF" == "1" ]; then
         RESULTS_FILENAME="iperf_basic"
-        echo "${base_iperf_cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
-        eval "${base_iperf_cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
+        echo "${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
+        eval "${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
 else
         ### Test Duration
         for duration in $IPERF_DURATION;
@@ -105,13 +116,13 @@ else
                 sleep 3
                 if [ "$protocol" == "TCP" ]; then
                         RESULTS_FILENAME="iperf_protocol_${protocol}"
-                        cmd="${base_iperf_cmd}"
+                        cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION}"
                         echo "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
                         eval "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
                 fi
                 if [ "$protocol" == "UDP" ]; then
                         RESULTS_FILENAME="iperf_protocol_${protocol}"
-                        cmd="${base_iperf_cmd} -u -b 0"
+                        cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -u -b 0"
                         echo "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
                         eval "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
                 fi
@@ -123,19 +134,19 @@ else
                 sleep 3
                 if [ "$direction" == "NORMAL" ]; then
                         RESULTS_FILENAME="iperf_direction_${direction}"
-                        cmd="${base_iperf_cmd}"
+                        cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION}"
                         echo "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
                         eval "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
                 fi
                 if [ "$direction" == "REVERSE" ]; then
                         RESULTS_FILENAME="iperf_direction_${direction}"
-                        cmd="${base_iperf_cmd} -R"
+                        cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -R"
                         echo "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
                         eval "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
                 fi
                 if [ "$direction" == "BIDIRECTIONAL" ]; then
                         RESULTS_FILENAME="iperf_direction_${direction}"
-                        cmd="${base_iperf_cmd} --bidir"
+                        cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} --bidir"
                         echo "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
                         eval "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
                 fi
@@ -146,7 +157,7 @@ else
         do
                 sleep 3
                 RESULTS_FILENAME="iperf_streams_${streams}"
-                cmd="${base_iperf_cmd} -P ${streams}"
+                cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -P ${streams}"
                 echo "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
                 eval "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
         done
@@ -156,7 +167,7 @@ else
         do
                 sleep 3
                 RESULTS_FILENAME="iperf_buffer_length_${buffer_length}"
-                cmd="${base_iperf_cmd} -l ${buffer_length}"
+                cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -l ${buffer_length}"
                 echo "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
                 eval "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
         done
@@ -166,7 +177,7 @@ else
         do
                 sleep 3
                 RESULTS_FILENAME="iperf_window_size_${window_size}"
-                cmd="${base_iperf_cmd} -w ${window_size}"
+                cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -w ${window_size}"
                 echo "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
                 eval "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
         done
@@ -180,7 +191,7 @@ else
                 echo "ip link set dev ${ADAPTER} mtu ${mtu}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
                 ip link set dev ${ADAPTER} mtu ${mtu}
                 sleep 3
-                cmd="${base_iperf_cmd}"
+                cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION}"
                 echo "${cmd}" >> "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
                 eval "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
         done
@@ -193,7 +204,7 @@ else
                 echo "tc qdisc add dev ${ADAPTER} root netem delay ${latency}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
                 tc qdisc add dev ${ADAPTER} root netem delay ${latency}
                 sleep 3
-                cmd="${base_iperf_cmd}"
+                cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION}"
                 echo "${cmd}" >> "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
                 eval "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
                 echo "tc qdisc del dev ${ADAPTER} root netem delay ${latency}" >> "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
@@ -209,7 +220,7 @@ else
                 echo "tc qdisc add dev ${ADAPTER} root netem loss ${packet_loss}" >> "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
                 tc qdisc add dev ${ADAPTER} root netem loss ${packet_loss}
                 sleep 3
-                cmd="${base_iperf_cmd}"
+                cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION}"
                 echo "${cmd}" >> "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
                 eval "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
                 echo "tc qdisc del dev ${ADAPTER} root netem loss ${packet_loss}" >> "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
@@ -227,21 +238,23 @@ fi
 printf "\n${CYAN}Measuring latency network performance.${NC}\n"
 
 base_ping_cmd="ping ${SERVER} -I ${ADAPTER}"
+echo Base command: ${base_ping_cmd} -c ${PING_DEFAULT_COUNT} >> ${OUTPUT_DIR}/${RUN_STAMP}/info.txt
+
 ip link set dev ${ADAPTER} mtu 1500
 tc qdisc del dev ${ADAPTER} root || true
 sleep 3
 
 if [ "$RUN_DEFAULT_PING" == "1" ]; then
         RESULTS_FILENAME="ping_basic"
-        echo "${base_ping_cmd} -c 10" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
-        eval "${base_ping_cmd} -c 10" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
+        echo "${base_ping_cmd} -c ${PING_DEFAULT_COUNT}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
+        eval "${base_ping_cmd} -c ${PING_DEFAULT_COUNT}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
 else
         ### Test Interval
         for interval in $PING_INTERVAL;
         do
                 sleep 3
                 RESULTS_FILENAME="ping_interval_${interval}"
-                cmd="${base_ping_cmd} -c 10 -i ${interval}"
+                cmd="${base_ping_cmd} -c ${PING_DEFAULT_COUNT} -i ${interval}"
                 echo "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
                 eval "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
         done
@@ -251,7 +264,7 @@ else
         do
                 sleep 3
                 RESULTS_FILENAME="ping_packet_size_${packet_size}"
-                cmd="${base_ping_cmd} -c 10 -s ${packet_size}"
+                cmd="${base_ping_cmd} -c ${PING_DEFAULT_COUNT} -s ${packet_size}"
                 echo "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
                 eval "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
         done
@@ -272,7 +285,7 @@ else
                 echo "tc qdisc add dev ${ADAPTER} root netem delay ${latency}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
                 tc qdisc add dev ${ADAPTER} root netem delay ${latency}
                 sleep 3
-                cmd="${base_ping_cmd} -c 10"
+                cmd="${base_ping_cmd} -c ${PING_DEFAULT_COUNT}"
                 echo "${cmd}" >> "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
                 eval "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
                 echo "tc qdisc del dev ${ADAPTER} root netem delay ${latency}" >> "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
