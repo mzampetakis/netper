@@ -90,9 +90,9 @@ apt-get install -y iproute2
 ############################ Bandwidth Measurements ############################
 printf "\n${CYAN}Measuring bandwidth network performance.${NC}\n"
 
-echo ${NAME} > ${OUTPUT_DIR}/${RUN_STAMP}/info.txt
+echo ${NAME} > ${OUTPUT_DIR}/${RUN_STAMP}/info.json
 base_iperf_cmd="iperf3 -c ${SERVER} -p ${IPERF_PORT} -O 5 -J --get-server-output"
-echo Base command: ${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} >> ${OUTPUT_DIR}/${RUN_STAMP}/info.txt
+echo ${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} > ${OUTPUT_DIR}/${RUN_STAMP}/iperf.cmd
 
 ### Basic run
 if [ "$RUN_DEFAULT_IPERF" == "1" ]; then
@@ -238,7 +238,7 @@ fi
 printf "\n${CYAN}Measuring latency network performance.${NC}\n"
 
 base_ping_cmd="ping ${SERVER} -I ${ADAPTER}"
-echo Base command: ${base_ping_cmd} -c ${PING_DEFAULT_COUNT} >> ${OUTPUT_DIR}/${RUN_STAMP}/info.txt
+echo ${base_ping_cmd} -c ${PING_DEFAULT_COUNT} > ${OUTPUT_DIR}/${RUN_STAMP}/ping.cmd
 
 ip link set dev ${ADAPTER} mtu 1500
 tc qdisc del dev ${ADAPTER} root || true
@@ -293,7 +293,7 @@ else
                 sleep 3
         done
 fi
-  
+
 
 ########################### End Latency Measurements ###########################
 #Revert original MTU
