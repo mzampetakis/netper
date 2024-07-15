@@ -120,4 +120,32 @@ and the standard deviation of each result's file. It can be used as:
 ```
 
 The results will be printed out and also written to files with the same name as the results' files in a json format.
-The suffix of these metrics' files will be `_results.json` 
+The suffix of these metrics' files will be `_results.json`
+
+
+### Plotting results
+
+Using the provided python script `bar_chart.py` we can plot various setups in order to compare result for different 
+variations and setups.
+
+the usage of the script is:
+```bash
+python3 bar_chart.py -h
+usage: bar_chart.py [-h] --prefix PREFIX [--title TITLE] --execution EXECUTION [EXECUTION ...]
+
+Plots network performance results.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --prefix PREFIX       The prefix of results to measure
+  --title TITLE         The title to process
+  --execution EXECUTION [EXECUTION ...]
+                        Execution(s) to plot
+```
+
+An example command for plotting the results for 4 different executions (provided by `--execution` argument), for all 
+variations that are prefixed with `ping_packet_size_` and add a custom title `Latency - Packet size`:
+
+```bash
+python3 bar_chart.py --title "Latency - Packet size" --prefix ping_packet_size_  --execution ./results/2024-07-12-10-53-21 ./results/2024-07-12-11-32-13 ./results/2024-07-12-12-12-03 ./results/2024-07-12-12-52-43
+```
