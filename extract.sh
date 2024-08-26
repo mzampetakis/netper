@@ -78,7 +78,7 @@ for FILE in "$DIR_NAME"/"iperf"*".json"; do
       {"average_bandwidth_mbps": "${AVERAGE_BANDWIDTH_MBPS}","standard_deviation_bandwidth_mbps": "${DEVIATION_BANDWIDTH_MBPS}"}
 EOF
       )
-      echo "${json_results}" | jq > $RESULTS_FILE
+      echo "${json_results}" | jq > "$RESULTS_FILE"
     else
       echo "    No intervals found in the JSON file."
     fi
@@ -109,8 +109,8 @@ for FILE in "$DIR_NAME"/"ping"*".json"; do
     echo "    Average Latency: $AVERAGE_LATENCY_MS ms"
     echo "    Standard Latency Deviation: $DEVIATION_LATENCY_MS ms"
 
-    echo "Average Latency: $AVERAGE_LATENCY_MS ms" > $RESULTS_FILE
-    echo "Standard Latency Deviation: $DEVIATION_LATENCY_MS ms" >> $RESULTS_FILE
+    echo "Average Latency: $AVERAGE_LATENCY_MS ms" > "$RESULTS_FILE"
+    echo "Standard Latency Deviation: $DEVIATION_LATENCY_MS ms" >> "$RESULTS_FILE"
 
 
       json_results=$(cat <<EOF
