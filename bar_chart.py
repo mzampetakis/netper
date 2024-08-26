@@ -44,6 +44,8 @@ def main():
     parser.add_argument('--prefix', type=str, required=True, help='The prefix of results to measure')
     parser.add_argument('--title', type=str, default='', help='The title to process')
     parser.add_argument('--execution', nargs='+', type=str, required=True, help='Execution(s) to plot')
+    parser.add_argument('--colors', nargs='+', type=str, required=True, help='Colors for each execution')
+
     args = parser.parse_args()
 
     print('Title: ', args.title)
@@ -51,6 +53,10 @@ def main():
         args.title = args.prefix.replace('_', ' ')
     print('Prefix: ', args.prefix)
     print('Executions to plot:', ', '.join(args.execution))
+
+    if len(args.colors) != len(args.execution):
+        print("The number of colors must match the number of executions.")
+        sys.exit(1)
 
     results_suffix = "_results.json"
     total_variations = 0
@@ -99,7 +105,7 @@ def main():
 
         arg = "average_latency_ms" if args.prefix.startswith("ping") else "average_bandwidth_mbps"
 
-        # Foe rach file in execution that matches the given prefix
+        # For each file in execution that matches the given prefix
         for filepath in matched_files:
             avg = parse_json_field(filepath, arg)
             if avg is None:
@@ -126,21 +132,19 @@ def main():
             if execution in execution_index:
                 sorted_variations[key][execution_index[execution]] = value
 
-    # print("Sorted Variations:", sorted_variations)
-    # print("Sorted Executions:", all_executions)
-
     # Plot
     x = np.arange(len(all_executions))
     width = 1 / (len(args.execution) + 1)
     multiplier = 1
 
     fig, ax = plt.subplots(figsize=(16, 9))
-    for attribute, measurements in sorted_variations.items():
+    for i, (attribute, measurements) in enumerate(sorted_variations.items()):
         if None in measurements:
             print(f"Warning: Some measurements are missing for {attribute}")
 
         offset = width * multiplier
-        rects = ax.bar(x + offset, measurements, width, label=attribute)
+        color = args.colors[i % len(args.colors)]
+        rects = ax.bar(x + offset, measurements, width, label=attribute, color=color)
         ax.bar_label(rects, padding=3)
         multiplier += 1
 
