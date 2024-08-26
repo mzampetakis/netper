@@ -141,11 +141,13 @@ optional arguments:
   --title TITLE         The title to process
   --execution EXECUTION [EXECUTION ...]
                         Execution(s) to plot
+  --colors COLORS [COLORS ...]
+                        Colors for each execution
 ```
 
 An example command for plotting the results for 4 different executions (provided by `--execution` argument), for all 
-variations that are prefixed with `ping_packet_size_` and add a custom title `Latency - Packet size`:
+variations that are prefixed with `ping_packet_size_`, with predefined colors and add a custom title `Latency - Packet size`:
 
 ```bash
-python3 bar_chart.py --title "Latency - Packet size" --prefix ping_packet_size_  --execution ./results/2024-07-12-10-53-21 ./results/2024-07-12-11-32-13 ./results/2024-07-12-12-12-03 ./results/2024-07-12-12-52-43
+python3 bar_chart.py --title "Latency - Packet size" --prefix ping_packet_size_  --execution ./results/2024-07-12-10-53-21 ./results/2024-07-12-11-32-13 ./results/2024-07-12-12-12-03 ./results/2024-07-12-12-52-43 --colors red greeb blue orange
 ```

@@ -44,7 +44,7 @@ def main():
     parser.add_argument('--prefix', type=str, required=True, help='The prefix of results to measure')
     parser.add_argument('--title', type=str, default='', help='The title to process')
     parser.add_argument('--execution', nargs='+', type=str, required=True, help='Execution(s) to plot')
-    parser.add_argument('--colors', nargs='+', type=str, required=True, help='Colors for each execution')
+    parser.add_argument('--colors', nargs='+', type=str, help='Colors for each execution')
 
     args = parser.parse_args()
 
@@ -54,7 +54,10 @@ def main():
     print('Prefix: ', args.prefix)
     print('Executions to plot:', ', '.join(args.execution))
 
-    if len(args.colors) != len(args.execution):
+    # If no colors are provided, use a default color palette
+    if args.colors is None:
+        args.colors = plt.cm.get_cmap('tab10').colors[:len(args.execution)]
+    elif len(args.colors) != len(args.execution):
         print("The number of colors must match the number of executions.")
         sys.exit(1)
 
