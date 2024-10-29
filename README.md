@@ -18,6 +18,7 @@ value for each one of them:
 | * `ADAPTER`              | The adapter to use for traffic routing.                                                  | ""             | ""                                  |
 | `IPERF_PORT`             | Port to use for the iperf connection to the server. (`-p` arg).                          | "5201"         | "5201"                              |
 | `IPERF_DEFAULT_DURATION` | Default Duration of the iperf run in secs. (`-t` arg)                                    | "20"           | "20"                                |
+| `IPERF_RUN_BOTH_PROTOS`  | Run all tests for both TCP and UDP protocols                                             | "FALSE"        | "FALSE"                             |
 | `IPERF_DURATION`         | Duration of the iperf run in secs. (`-t` arg) (Multiple args delimited by `;`)           | "10"           | "10;30;60;300"                      |
 | `IPERF_PROTOCOL`         | Protocols to test (TCP and UDP). Accepts multiple args delimited by `;`.                 | "TCP"          | "TCP;UDP"                           |
 | `IPERF_DIRECTION`        | Direction of traffic to test. (Client to server, Reverse or bidirectional.               | "NORMAL"       | "NORMAL;REVERSE;BIDIRECTIONAL"      |
@@ -83,33 +84,28 @@ at the `netperf.out` file in the same directory with the script.
 The final contents of the results will contain files like the listed ones bellow:
 ```
 ├── 2024-07-09-12-50-21
-│   ├── iperf_buffer_length_128k.cmd
-│   ├── iperf_buffer_length_128k.json
-│   ├── iperf_buffer_length_128k_results.txt
-│   ├── iperf_buffer_length_16k.cmd
-│   ├── iperf_buffer_length_16k.json
-│   ├── iperf_buffer_length_16k_results.txt
-│   ├── iperf_streams_2.cmd
-│   ├── iperf_streams_2.json
-│   ├── iperf_streams_2_results.txt
-│   ├── iperf_streams_4.cmd
-│   ├── iperf_streams_4.json
-│   ├── iperf_streams_4_results.txt
-│   ├── ping_latency_50ms.cmd
-│   ├── ping_latency_50ms.json
-│   ├── ping_latency_50ms_results.txt
-│   ├── ping_latency_5ms.cmd
-│   ├── ping_latency_5ms.json
-│   ├── ping_latency_5ms_results.txt
-│   ├── ping_packet_size_1024.cmd
-│   ├── ping_packet_size_1024.json
-│   ├── ping_packet_size_1024_results.txt
-│   ├── ping_packet_size_56.cmd
-│   ├── ping_packet_size_56.json
-│   └── ping_packet_size_56_results.txt
+│   ├── iper_tcpf_buffer_length_128k.cmd
+│   ├── iper_tcpf_buffer_length_128k.json
+│   ├── iper_tcpf_buffer_length_16k.cmd
+│   ├── iper_tcpf_buffer_length_16k.json
+│   ├── iper_tcpf_streams_2.cmd
+│   ├── iper_tcpf_streams_2.json
+│   ├── iper_tcpf_streams_4.cmd
+│   ├── iper_tcpf_streams_4.json
+│   ├── ping_tcp_latency_50ms_.cmd
+│   ├── ping_tcp_latency_50ms.json
+│   ├── ping_tcp_latency_5ms.cmd
+│   ├── ping_tcp_latency_5ms.json
+│   ├── ping_tcp_packet_size_1024.cmd
+│   ├── ping_tcp_packet_size_1024.json
+│   ├── ping_tcp_packet_size_56.cmd
+│   ├── ping_tcp_packet_size_56.json
 │   └── ...
 └── info.txt
 ```
+
+If `IPERF_RUN_BOTH_PROTOS` is set to "TRUE" there will be the more files (the same as before) but with the 
+`_udp` in its name instead of `_tcp`. 
 
 ### Extracting results' info
 
@@ -122,6 +118,23 @@ and the standard deviation of each result's file. It can be used as:
 The results will be printed out and also written to files with the same name as the results' files in a json format.
 The suffix of these metrics' files will be `_results.json`
 
+So the results directory will look like this:
+```
+├── 2024-07-09-12-50-21
+│   ├── iper_tcpf_buffer_length_128k.cmd
+│   ├── iper_tcpf_buffer_length_128k.json
+│   ├── iper_tcpf_buffer_length_128k.results
+│   ├── iper_tcpf_buffer_length_16k.cmd
+│   ├── iper_tcpf_buffer_length_16k.json
+│   ├── iper_tcpf_buffer_length_16k.results
+│   ├── iper_tcpf_streams_2.cmd
+│   ├── iper_tcpf_streams_2.json
+│   ├── iper_tcpf_streams_2.results
+│   ├── iper_tcpf_streams_4.cmd
+│   ├── iper_tcpf_streams_4.json
+│   ├── iper_tcpf_streams_4.results
+...
+```
 
 ### Plotting results
 
