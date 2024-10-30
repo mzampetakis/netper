@@ -53,6 +53,10 @@ then
         IPERF_DEFAULT_DURATION=20
 fi
 
+if [ -z "$IPERF_DEFAULT_BUFFER_LENGTH" ];
+then
+        IPERF_DEFAULT_BUFFER_LENGTH=64k
+fi
 if [ -z "$PING_DEFAULT_COUNT" ];
 then
         PING_DEFAULT_COUNT=60
@@ -97,13 +101,13 @@ echo ${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} > ${OUTPUT_DIR}/${RUN_STAMP}
 ### Basic run
 if [ "$RUN_DEFAULT_IPERF" == "1" ]; then
     RESULTS_FILENAME="iperf_basic_tcp"
-    echo "${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
-    eval "${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
+    echo "${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -l ${IPERF_DEFAULT_BUFFER_LENGTH}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
+    eval "${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -l ${IPERF_DEFAULT_BUFFER_LENGTH}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
 
     if [ "$IPERF_RUN_BOTH_PROTOS" == "TRUE" ]; then
       RESULTS_FILENAME="iperf_basic_udp"
-      echo "${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
-      eval "${base_iperf_cmd} -u -t ${IPERF_DEFAULT_DURATION}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
+      echo "${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -l ${IPERF_DEFAULT_BUFFER_LENGTH}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
+      eval "${base_iperf_cmd} -u -t ${IPERF_DEFAULT_DURATION} -l ${IPERF_DEFAULT_BUFFER_LENGTH}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
     fi
 else
     ### Test Duration
@@ -111,13 +115,13 @@ else
     do
         sleep 3
         RESULTS_FILENAME="iperf_tcp_duration_${duration}"
-        cmd="${base_iperf_cmd} -t ${duration}"
+        cmd="${base_iperf_cmd} -t ${duration} -l ${IPERF_DEFAULT_BUFFER_LENGTH}"
         echo "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
         eval "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
         if [ "$IPERF_RUN_BOTH_PROTOS" == "TRUE" ]; then
             sleep 3
             RESULTS_FILENAME="iperf_udp_duration_${duration}"
-            cmd="${base_iperf_cmd} -t ${duration} -u"
+            cmd="${base_iperf_cmd} -t ${duration} -l ${IPERF_DEFAULT_BUFFER_LENGTH} -u"
             echo "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
             eval "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
         fi
@@ -129,13 +133,13 @@ else
             sleep 3
             if [ "$protocol" == "TCP" ]; then
                     RESULTS_FILENAME="iperf_protocol_${protocol}"
-                    cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION}"
+                    cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -l ${IPERF_DEFAULT_BUFFER_LENGTH}"
                     echo "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
                     eval "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
             fi
             if [ "$protocol" == "UDP" ]; then
                     RESULTS_FILENAME="iperf_protocol_${protocol}"
-                    cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -u -b 0"
+                    cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -l ${IPERF_DEFAULT_BUFFER_LENGTH} -u -b 0"
                     echo "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
                     eval "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
             fi
@@ -147,19 +151,19 @@ else
         sleep 3
         if [ "$direction" == "NORMAL" ]; then
                 RESULTS_FILENAME="iperf_tcp_direction_${direction}"
-                cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION}"
+                cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -l ${IPERF_DEFAULT_BUFFER_LENGTH}"
                 echo "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
                 eval "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
         fi
         if [ "$direction" == "REVERSE" ]; then
                 RESULTS_FILENAME="iperf_tcp_direction_${direction}"
-                cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -R"
+                cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -l ${IPERF_DEFAULT_BUFFER_LENGTH} -R"
                 echo "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
                 eval "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
         fi
         if [ "$direction" == "BIDIRECTIONAL" ]; then
                 RESULTS_FILENAME="iperf_tcp_direction_${direction}"
-                cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} --bidir"
+                cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -l ${IPERF_DEFAULT_BUFFER_LENGTH} --bidir"
                 echo "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
                 eval "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
         fi
@@ -167,19 +171,19 @@ else
             sleep 3
             if [ "$direction" == "NORMAL" ]; then
                     RESULTS_FILENAME="iperf_udp_direction_${direction}"
-                    cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -u"
+                    cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -l ${IPERF_DEFAULT_BUFFER_LENGTH} -u"
                     echo "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
                     eval "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
             fi
             if [ "$direction" == "REVERSE" ]; then
                     RESULTS_FILENAME="iperf_udp_direction_${direction}"
-                    cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -R -u"
+                    cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -l ${IPERF_DEFAULT_BUFFER_LENGTH} -R -u"
                     echo "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
                     eval "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
             fi
             if [ "$direction" == "BIDIRECTIONAL" ]; then
                     RESULTS_FILENAME="iperf_udp_direction_${direction}"
-                    cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} --bidir -u"
+                    cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -l ${IPERF_DEFAULT_BUFFER_LENGTH} --bidir -u"
                     echo "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
                     eval "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
             fi
@@ -191,13 +195,13 @@ else
     do
         sleep 3
         RESULTS_FILENAME="iperf_tcp_streams_${streams}"
-        cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -P ${streams}"
+        cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -l ${IPERF_DEFAULT_BUFFER_LENGTH} -P ${streams}"
         echo "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
         eval "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
         if [ "$IPERF_RUN_BOTH_PROTOS" == "TRUE" ]; then
             sleep 3
             RESULTS_FILENAME="iperf_udp_streams_${streams}"
-            cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -P ${streams} -u"
+            cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -l ${IPERF_DEFAULT_BUFFER_LENGTH} -P ${streams} -u"
             echo "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
             eval "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
         fi
@@ -208,13 +212,13 @@ else
     do
         sleep 3
         RESULTS_FILENAME="iperf_tcp_buffer_length_${buffer_length}"
-        cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -l ${buffer_length}"
+        cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -l ${buffer_length} -l ${IPERF_DEFAULT_BUFFER_LENGTH}"
         echo "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
         eval "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
         if [ "$IPERF_RUN_BOTH_PROTOS" == "TRUE" ]; then
             sleep 3
             RESULTS_FILENAME="iperf_udp_buffer_length_${buffer_length}"
-            cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -l ${buffer_length} -u"
+            cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -l ${buffer_length} -l ${IPERF_DEFAULT_BUFFER_LENGTH} -u"
             echo "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
             eval "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
         fi
@@ -225,13 +229,13 @@ else
     do
         sleep 3
         RESULTS_FILENAME="iperf_tcp_window_size_${window_size}"
-        cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -w ${window_size}"
+        cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -l ${IPERF_DEFAULT_BUFFER_LENGTH} -w ${window_size}"
         echo "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
         eval "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
         if [ "$IPERF_RUN_BOTH_PROTOS" == "TRUE" ]; then
             sleep 3
             RESULTS_FILENAME="iperf_udp_window_size_${window_size}"
-            cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -w ${window_size} -u"
+            cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -l ${IPERF_DEFAULT_BUFFER_LENGTH} -w ${window_size} -u"
             echo "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
             eval "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
         fi
@@ -246,13 +250,13 @@ else
         echo "ip link set dev ${ADAPTER} mtu ${mtu}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
         ip link set dev ${ADAPTER} mtu ${mtu}
         sleep 3
-        cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION}"
+        cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -l ${IPERF_DEFAULT_BUFFER_LENGTH}"
         echo "${cmd}" >> "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
         eval "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
         if [ "$IPERF_RUN_BOTH_PROTOS" == "TRUE" ]; then
             sleep 3
             RESULTS_FILENAME="iperf_udp_mtu_${mtu}"
-            cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -u"
+            cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -l ${IPERF_DEFAULT_BUFFER_LENGTH} -u"
             echo "${cmd}" >> "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
             eval "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
 
@@ -267,13 +271,13 @@ else
         echo "tc qdisc add dev ${ADAPTER} root netem delay ${latency}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
         tc qdisc add dev ${ADAPTER} root netem delay ${latency}
         sleep 3
-        cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION}"
+        cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -l ${IPERF_DEFAULT_BUFFER_LENGTH}"
         echo "${cmd}" >> "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
         eval "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
         if [ "$IPERF_RUN_BOTH_PROTOS" == "TRUE" ]; then
             sleep 3
             RESULTS_FILENAME="iperf_udp_latency_${latency}"
-            cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -u"
+            cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -l ${IPERF_DEFAULT_BUFFER_LENGTH} -u"
             echo "${cmd}" >> "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
             eval "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
         fi
@@ -290,13 +294,13 @@ else
         echo "tc qdisc add dev ${ADAPTER} root netem loss ${packet_loss}" >> "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
         tc qdisc add dev ${ADAPTER} root netem loss ${packet_loss}
         sleep 3
-        cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION}"
+        cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -l ${IPERF_DEFAULT_BUFFER_LENGTH}"
         echo "${cmd}" >> "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
         eval "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
         if [ "$IPERF_RUN_BOTH_PROTOS" == "TRUE" ]; then
             sleep 3
             RESULTS_FILENAME="iperf_udp_packet_loss_${packet_loss}"
-            cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -u"
+            cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -l ${IPERF_DEFAULT_BUFFER_LENGTH} -u"
             echo "${cmd}" >> "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
             eval "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
         fi
