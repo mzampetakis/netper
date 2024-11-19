@@ -212,13 +212,13 @@ else
     do
         sleep 3
         RESULTS_FILENAME="iperf_tcp_buffer_length_${buffer_length}"
-        cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -l ${buffer_length} -l ${IPERF_DEFAULT_BUFFER_LENGTH}"
+        cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -l ${buffer_length}"
         echo "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
         eval "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
         if [ "$IPERF_RUN_BOTH_PROTOS" == "TRUE" ]; then
             sleep 3
             RESULTS_FILENAME="iperf_udp_buffer_length_${buffer_length}"
-            cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -l ${buffer_length} -l ${IPERF_DEFAULT_BUFFER_LENGTH} -u"
+            cmd="${base_iperf_cmd} -t ${IPERF_DEFAULT_DURATION} -l ${buffer_length} -u"
             echo "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.cmd"
             eval "${cmd}" > "${OUTPUT_DIR}/${RUN_STAMP}/${RESULTS_FILENAME}.json"
         fi
